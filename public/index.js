@@ -1,4 +1,5 @@
 
+
 new Vue({
   el: '#app',
   data: {
@@ -9,30 +10,85 @@ new Vue({
     longitudCiudad: '',
     nombreCiudad : '',
     mostrarTabla: false,
-    climaDesc : []
+    climaDesc : [],
+    horaCiudad : [],
+    hora: '',
+    modoNocturno: false,
+    modoClaro:true,
+    textoBotonNocturno : 'Nocturno'
   },
   methods: {
+    modoNocturnoF : function(hora=NaN){
+      if (isNaN(hora)){
+        if(this.modoNocturno){
+          this.modoNocturno = false;
+          this.modoClaro = true;
+          this.textoBotonNocturno = 'Nocturno'
+        }else{
+          this.modoNocturno = true;
+          this.modoClaro = false;
+          this.textoBotonNocturno = 'Claro'
+      }
+      }else{
+        if (this.hora < 7 || this.hora > 19){
+          this.modoNocturno = true;
+          this.modoClaro = false;
+          this.textoBotonNocturno = 'Claro'
+        }else{
+          this.modoNocturno = false;
+          this.modoClaro = true;
+          this.textoBotonNocturno = 'Nocturno'
+        }
+      }
+    },
     cargarCiudades: function (){
       this.mostrarTabla = false;
       var self = this;
       let ciudad = this.ciudad;
-      axios.get('https://clima-fabio.herokuapp.com/api/buscar/'+ciudad)
+      axios.get('http://localhost:8080/api/buscar/'+ciudad)
       .then(
         function (response){
           self.listaCiudades = response.data;
         }
       )
     },
-    imprimeCiudad: function(latitud,longitud){
+    imprimeCiudad: async function(latitud,longitud){
       var self = this;
-      axios.get('https://clima-fabio.herokuapp.com/api/clima/'+latitud+'/'+longitud)
-      .then(
-        function(response){
-          self.climaDesc.pop();
-          self.climaDesc.push(response.data);
-          self.mostrarTabla = true;
-        }
-      )
+
+
+      let clima = 'http://localhost:8080/api/clima/'+latitud+'/'+longitud;
+      let hora =  'http://localhost:8080/api/timeZone/'+latitud+'/'+longitud;
+
+      const reqOne = axios.get(clima);
+      const reqTwo = axios.get(hora);
+
+      await axios.all([reqOne,reqTwo]).
+      then(axios.spread((...responses)=>{
+        const responseOne = responses[0].data;
+        const responseTwo = responses[1].data;
+        self.climaDesc.pop();
+        self.climaDesc.push(responseOne);
+        self.horaCiudad.pop();
+        self.horaCiudad.push(responseTwo);
+        self.hora = self.horaCiudad[0].localTime !='undefined' ? Number(self.horaCiudad[0].localTime.slice(11,13)) : "No definido";
+        self.mostrarTabla = true;
+      }))
+      .catch(error=>{
+        console.log(error);
+      })
+      this.modoNocturnoF(this.hora);
+      
+
+
+      //axios.get('http://localhost:8080/api/clima/'+latitud+'/'+longitud)
+      //.then(
+      //  function(response){
+      //    self.climaDesc.pop();
+      //    self.climaDesc.push(response.data);
+      //    self.mostrarTabla = true;
+      //  }
+      //)    
     } 
   }
 })
+

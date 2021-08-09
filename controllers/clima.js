@@ -19,7 +19,6 @@ const clima = async (req,res) => {
     })
     const respuesta = await instance.get();
     const {weather,main,wind,name} = respuesta.data;
-    console.log(respuesta.data)
     const resultado = {
       desc: weather[0].description,
       min: main.temp_min,

@@ -13,6 +13,8 @@ class Server{
     this.app.use(this.buscar,require('../routes/busqueda'));
     this.clima = '/api/clima';
     this.app.use(this.clima,require('../routes/clima'));
+    this.timeZone = '/api/timezone';
+    this.app.use(this.timeZone,require('../routes/timeZone'))
   };
 
   listen(){
