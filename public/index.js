@@ -45,7 +45,7 @@ new Vue({
       this.mostrarTabla = false;
       var self = this;
       let ciudad = this.ciudad;
-      axios.get('http://localhost:8080/api/buscar/'+ciudad)
+      axios.get('http://clima-fabio.herokuapp.com/api/buscar/'+ciudad)
       .then(
         function (response){
           self.listaCiudades = response.data;
@@ -56,8 +56,8 @@ new Vue({
       var self = this;
 
 
-      let clima = 'http://localhost:8080/api/clima/'+latitud+'/'+longitud;
-      let hora =  'http://localhost:8080/api/timeZone/'+latitud+'/'+longitud;
+      let clima = 'http://clima-fabio.herokuapp.com/api/clima/'+latitud+'/'+longitud;
+      let hora =  'http://clima-fabio.herokuapp.com/api/timeZone/'+latitud+'/'+longitud;
 
       const reqOne = axios.get(clima);
       const reqTwo = axios.get(hora);
